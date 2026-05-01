@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat Pesanan - Rumah Makan Padang</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <style>
+        :root {
+            --primary: #5D4037; /* Deep Brown */
+            --secondary: #8D6E63; /* Earthy Brown */
+            --bg-soft: #FDF8F5; /* Warm Soft Cream */
+            --white: #ffffff;
+            --gray-100: #f1f5f9;
+            --gray-500: #64748b;
+            --gray-800: #1e293b;
+        }
+
+        body {
+            background-color: var(--bg-soft);
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Leaflet Map Styles */
+        .order-map-container {
+            height: 200px;
+            width: 100%;
+            border-radius: 12px;
+            margin: 1rem 0;
+            z-index: 1;
+            border: 1px solid var(--gray-100);
+        }
+
+        .driver-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--gray-100);
+            padding: 0.75rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+        }
+
+        .driver-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
+
+        .tracking-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .pulse {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 0 rgba(93, 64, 55, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(93, 64, 55, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(93, 64, 55, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(93, 64, 55, 0); }
+        }
+
+        .history-header {
+            background: linear-gradient(rgba(93, 64, 55, 0.9), rgba(93, 64, 55, 0.9)), url('https://images.unsplash.com/photo-1541518763669-279f00ed51ca?q=80&w=1600&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .history-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            border: 1px solid rgba(0,0,0,0.03);
+            transition: transform 0.3s;
+        }
+
+        .history-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .order-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px dashed var(--gray-100);
+            margin-bottom: 1rem;
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-diproses { background: #fffbeb; color: #d97706; }
+        .status-dikirim { background: #eff6ff; color: #2563eb; }
+        .status-selesai { background: #f0fdf4; color: #166534; }
+        .status-dibatalkan { background: #fef2f2; color: #dc2626; }
+
+        .order-items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: var(--gray-500);
+        }
+
+        .empty-history {
+            text-align: center;
+            padding: 5rem 2rem;
+            background: white;
+            border-radius: 24px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="logo">RM<span>PADANG</span></a>
+            <div class="menu-toggle" onclick="toggleMobileMenu()"><i class="fa-solid fa-bars"></i></div>
+            <div class="nav-menu">
+                <a href="index.html">Beranda</a>
+                <a href="menu.html">Menu</a>
+                <a href="history.html" class="active">Riwayat</a>
+                <a href="cart.html" class="cart-icon">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="cart-count">0</span>
+                </a>
+                <a href="login.html" class="btn-login" id="nav-auth-btn">Masuk</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="history-header">
+        <div class="container">
+            <h1 style="font-family: 'Fraunces', serif; font-size: 2.5rem; margin-bottom: 0.5rem;">Riwayat Pesanan</h1>
+            <p style="opacity: 0.8;">Pantau perjalanan rasa hidangan favorit Anda.</p>
+        </div>
+    </header>
+
+    <div class="container" style="max-width: 800px; margin-bottom: 5rem;">
+        <div id="history-container">
+            <!-- Loaded via JS -->
+            <div style="text-align: center; padding: 3rem;">
+                <p>Memuat riwayat transaksi...</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2024 RUMAH MAKAN PADANG. Masakan Khas Padang.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+        window.addEventListener('load', () => {
+            renderUserHistory();
+            updateAuthUI();
+        });
+
+        function renderUserHistory() {
+            const container = document.getElementById('history-container');
+            
+            // Get order IDs from browser cache
+            let myOrderIds = JSON.parse(localStorage.getItem('myOrders') || '[]');
+            
+            // For demo purposes: if empty, add some demo orders that have "Diproses" status
+            if (myOrderIds.length === 0) {
+                myOrderIds = ['ORD002', 'ORD006', 'ORD004'];
+                localStorage.setItem('myOrders', JSON.stringify(myOrderIds));
+            }
+
+            const allOrders = db.getOrders();
+            // Filter global orders that match our local cache IDs
+            const userOrders = allOrders.filter(o => myOrderIds.includes(o.id)).reverse();
+
+            if (userOrders.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-history">
+                        <div style="font-size: 4rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-star"></i></div>
+                        <h2 style="font-family: 'Fraunces', serif; margin-bottom: 1rem;">Mulai Petualangan Rasa</h2>
+                        <p style="color: var(--gray-500); margin-bottom: 2rem;">Pesanan yang Anda lakukan di perangkat ini akan muncul secara otomatis di sini.</p>
+                        <a href="menu.html" class="btn-primary" style="padding: 1rem 2.5rem; border-radius: 12px; text-decoration: none;">Eksplor Menu</a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = userOrders.map(order => {
+                const statusClass = 'status-' + order.status.toLowerCase().replace(' ', '-');
+                const isProcessing = order.status === 'Diproses';
+                const showMap = order.status === 'Dalam Pengiriman';
+                
+                return `
+                    <div class="history-card" data-order-id="${order.id}">
+                        <div class="order-meta">
+                            <div>
+                                <div style="font-size: 0.8rem; color: var(--gray-500); margin-bottom: 0.25rem;">ID Pesanan: <strong>${order.id}</strong></div>
+                                <div style="font-size: 0.9rem; font-weight: 600;"><i class="fa-solid fa-calendar-days"></i> ${order.date}</div>
+                            </div>
+                            <span class="status-badge ${statusClass}">${order.status}</span>
+                        </div>
+                        
+                        <div class="order-items-list">
+                            ${order.details ? order.details.map(item => `
+                                <div class="item-row">
+                                    <span>${item.name} (x${item.quantity})</span>
+                                    <span>Rp ${(item.price * item.quantity).toLocaleString()}</span>
+                                </div>
+                            `).join('') : `<span>${order.items} Item</span>`}
+                        </div>
+                        
+                        ${isProcessing ? `
+                            <div style="background: #fffbeb; border: 1px solid #fde68a; padding: 1rem; border-radius: 12px; margin-top: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+                                <div style="font-size: 2rem; color: #d97706;"><i class="fa-solid fa-fire-burner"></i></div>
+                                <div>
+                                    <h4 style="margin: 0; color: #92400e; font-size: 0.95rem;">Pesanan Sedang Disiapkan</h4>
+                                    <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem; color: #b45309;">Chef kami sedang mengolah bumbu warisan untuk hidangan terbaik Anda.</p>
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        ${showMap ? `
+                            <div style="margin-top: 1.5rem; border-top: 1px solid var(--gray-100); padding-top: 1.5rem;">
+                                <div class="tracking-status">
+                                    <div class="pulse"></div>
+                                    <span>LOKASI DRIVER LIVE</span>
+                                </div>
+                                <div id="map-${order.id}" class="order-map-container"></div>
+                                <div class="driver-card">
+                                    <div class="driver-avatar">IM</div>
+                                    <div class="driver-info-main">
+                                        <div class="driver-name">Imran Junaidi</div>
+                                        <div class="driver-vehicle">Honda Vario • B 1234 ABC</div>
+                                    </div>
+                                    <a href="tel:08123456789" class="btn-contact-driver" style="background: var(--primary); color: white; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; font-size: 0.85rem; font-weight: 700;"><i class="fa-solid fa-phone"></i> Hubungi</a>
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <div style="border-top: 1px solid var(--gray-100); margin-top: 1.5rem; padding-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: 500; color: var(--gray-800);">Total Pembayaran</span>
+                            <span style="font-weight: 800; color: var(--primary); font-size: 1.2rem;">Rp ${order.total.toLocaleString()}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Initialize Maps
+            userOrders.forEach(order => {
+                if (order.status === 'Dalam Pengiriman') {
+                    initOrderMap(order);
+                }
+            });
+        }
+
+        function initOrderMap(order) {
+            const mapId = `map-${order.id}`;
+            const mapContainer = document.getElementById(mapId);
+            if (!mapContainer) return;
+
+            // Mock Coordinates (Centering around Jakarta area as example)
+            const destLat = -6.2088 + (Math.random() * 0.02 - 0.01);
+            const destLng = 106.8456 + (Math.random() * 0.02 - 0.01);
+            
+            // Driver is slightly away
+            const driverLat = destLat + (Math.random() * 0.01);
+            const driverLng = destLng + (Math.random() * 0.01);
+
+            const map = L.map(mapId, {
+                zoomControl: false,
+                dragging: !L.Browser.mobile,
+                touchZoom: L.Browser.mobile
+            }).setView([driverLat, driverLng], 15);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(map);
+
+            // Custom Icons
+            const driverIcon = L.divIcon({
+                className: 'custom-div-icon',
+                html: `<div style="background: var(--primary); width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2);"><i class="fa-solid fa-motorcycle"></i></div>`,
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+
+            const destIcon = L.divIcon({
+                className: 'custom-div-icon',
+                html: `<div style="background: #1e293b; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2);"><i class="fa-solid fa-house"></i></div>`,
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+
+            L.marker([driverLat, driverLng], {icon: driverIcon}).addTo(map)
+                .bindPopup('Driver (Imran) sedang menuju lokasi Anda');
+            
+            L.marker([destLat, destLng], {icon: destIcon}).addTo(map)
+                .bindPopup('Lokasi Pengiriman');
+
+            // Draw Route (Simple Line)
+            const polyline = L.polyline([
+                [driverLat, driverLng],
+                [destLat, destLng]
+            ], {color: 'var(--primary)', weight: 3, dashArray: '10, 10'}).addTo(map);
+
+            // Fit bounds
+            map.fitBounds(polyline.getBounds(), {padding: [30, 30]});
+        }
+
+        function updateAuthUI() {
+            const user = getCurrentUser();
+            const authBtn = document.getElementById('nav-auth-btn');
+            if (user && authBtn) {
+                authBtn.textContent = 'Keluar';
+                authBtn.onclick = (e) => {
+                    e.preventDefault();
+                    logout();
+                };
+            }
+        }
+    </script>
+</body>
+</html>

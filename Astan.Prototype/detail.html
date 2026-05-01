@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Produk - Rumah Makan Padang</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="logo">RM<span>PADANG</span></a>
+            <div class="menu-toggle" onclick="toggleMobileMenu()"><i class="fa-solid fa-bars"></i></div>
+            <div class="nav-menu">
+                <a href="index.html">Beranda</a>
+                <a href="menu.html">Menu</a>
+                <a href="cart.html" class="cart-icon">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="cart-count">0</span>
+                </a>
+                <a href="login.html" class="btn-login">Masuk</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div style="padding: 2rem 0;">
+            <div id="product-detail" style="max-width: 600px; margin: 0 auto;">
+                <!-- Product detail will be loaded here -->
+            </div>
+            
+            <div class="card" style="padding: 1.5rem; max-width: 600px; margin: 0 auto;">
+                <div class="form-group">
+                    <label>Level Pedas</label>
+                    <select id="spicy-level">
+                        <option>Tidak Pedas</option>
+                        <option>Pedas Sedang</option>
+                        <option>Pedas</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Catatan (Opsional)</label>
+                    <textarea id="notes" rows="2" placeholder="Contoh: Tolong kurangi garam"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Jumlah</label>
+                    <input type="number" id="quantity" min="1" value="1">
+                </div>
+                
+                <button id="add-to-cart-btn" class="btn-primary" style="width: 100%;" onclick="addToCartWithDetails()">Tambah ke Keranjang</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <h3 style="color: var(--secondary); font-size: 1.5rem;">RUMAH MAKAN PADANG</h3>
+                    <p>Menyajikan hidangan khas Minang dengan cita rasa autentik.</p>
+                </div>
+                <div>
+                    <h3>Hubungi Kami</h3>
+                    <p><i class="fa-solid fa-location-dot"></i> Jl. Warisan No. 45, Jakarta</p>
+                    <p><i class="fa-solid fa-phone"></i> +62 21 555 1234</p>
+                    <p><i class="fa-solid fa-envelope"></i> info@rmpadang.com</p>
+                </div>
+                <div>
+                    <h3>Jam Perjamuan</h3>
+                    <p>Setiap Hari</p>
+                    <p>11:00 - 23:00 WIB</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 RUMAH MAKAN PADANG. Masakan Khas Padang.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function loadProductDetail() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = parseInt(urlParams.get('id'));
+            const allProducts = db.getProducts();
+            const product = allProducts.find(p => p.id === productId);
+            
+            if (product) {
+                const isOutOfStock = product.stock <= 0;
+                document.getElementById('product-detail').innerHTML = `
+                    <img src="${product.image}" alt="${product.name}" style="width: 100%; border-radius: var(--radius-md); aspect-ratio: 16/9; object-fit: cover; ${isOutOfStock ? 'filter: grayscale(1);' : ''}">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 1.5rem;">
+                        <div>
+                            <h1>${product.name}</h1>
+                            <p style="color: #666; margin-bottom: 0.5rem;">${product.category}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <h2 class="product-price">Rp ${product.price.toLocaleString()}</h2>
+                            <div style="margin-top: 0.25rem; font-weight: 700; color: ${isOutOfStock ? 'var(--accent)' : 'var(--primary)'};">
+                                ${isOutOfStock ? 'Stok Habis' : `Tersedia: ${product.stock} unit`}
+                            </div>
+                        </div>
+                    </div>
+                    <p style="color: #666; margin: 1.5rem 0;">${product.description || 'Nikmati hidangan lezat khas Minang dengan bumbu autentik yang meresap sempurna. Dibuat dari bahan-bahan pilihan berkualitas tinggi.'}</p>
+                `;
+                
+                const qtyInput = document.getElementById('quantity');
+                qtyInput.max = product.stock;
+                if (isOutOfStock) {
+                    qtyInput.value = 0;
+                    qtyInput.disabled = true;
+                    document.getElementById('add-to-cart-btn').disabled = true;
+                    document.getElementById('add-to-cart-btn').style.background = 'var(--gray-400)';
+                    document.getElementById('add-to-cart-btn').textContent = 'Stok Habis';
+                }
+            } else {
+                document.getElementById('product-detail').innerHTML = '<h3>Produk tidak ditemukan</h3>';
+            }
+        }
+
+        function addToCartWithDetails() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = parseInt(urlParams.get('id'));
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const notes = document.getElementById('notes').value;
+            const spicyLevel = document.getElementById('spicy-level').value;
+            
+            if (quantity <= 0) {
+                showToast('Jumlah pesanan tidak valid', 'error');
+                return;
+            }
+            
+            addToCart(productId, quantity, notes, spicyLevel);
+        }
+
+        window.addEventListener('load', loadProductDetail);
+    </script>
+    <script src="main.js"></script>
+</body>
+</html>

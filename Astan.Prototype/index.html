@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rumah Makan Padang - Masakan Khas Padang</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="logo">RM<span>PADANG</span></a>
+            <div class="menu-toggle" onclick="toggleMobileMenu()"><i class="fa-solid fa-bars"></i></div>
+            <div class="nav-menu">
+                <a href="index.html">Beranda</a>
+                <a href="menu.html">Menu</a>
+                <a href="history.html">Riwayat</a>
+                <a href="cart.html" class="cart-icon">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="cart-count">0</span>
+                </a>
+                <a href="login.html" class="btn-login">Masuk</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Cita Rasa Minang,<br>Tradisi Nan Autentik.</h1>
+                <p>Menyajikan kelezatan masakan khas Padang dengan rempah pilihan dan resep rahasia turun-temurun yang memanjakan lidah.</p>
+                <div class="hero-btns">
+                    <a href="menu.html" class="btn-primary">Jelajahi Menu</a>
+                    <a href="#popular" class="btn-secondary" style="margin-left: 1rem;">Produk Populer</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="categories">
+        <div class="container">
+            <h2 class="section-title">Koleksi Kami</h2>
+            <div class="category-grid">
+                <div class="category-card">
+                    <div class="category-icon"><i class="fa-solid fa-scroll"></i></div>
+                    <h3>Resep Warisan</h3>
+                    <p>Makanan Utama</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon"><i class="fa-solid fa-leaf"></i></div>
+                    <h3>Segar Alami</h3>
+                    <p>Minuman Herbal</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon"><i class="fa-solid fa-cookie"></i></div>
+                    <h3>Camilan Klasik</h3>
+                    <p>Jajanan Pasar</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon"><i class="fa-solid fa-pepper-hot"></i></div>
+                    <h3>Rempah Pilihan</h3>
+                    <p>Sambal & Bumbu</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Popular Products -->
+    <section class="categories" id="popular">
+        <div class="container">
+            <h2 class="section-title">Hidangan Unggulan</h2>
+            <div class="product-grid">
+                <div class="card product-card" data-id="1">
+                    <img src="https://images.unsplash.com/photo-1680675027408-7232d86cbc47?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Nasi Goreng" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-title">Nasi Goreng Kampung</h3>
+                        <p class="product-price">Rp 35.000</p>
+                        <button class="btn-primary add-to-cart-btn" data-id="1" style="width: 100%; margin-top: 0.5rem;">Tambah ke Keranjang</button>
+                    </div>
+                </div>
+                <div class="card product-card" data-id="2">
+                    <img src="https://images.unsplash.com/photo-1645696301019-35adcc18fc21?q=80&w=1629&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Sate Ayam" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-title">Sate Ayam Madura</h3>
+                        <p class="product-price">Rp 40.000</p>
+                        <button class="btn-primary add-to-cart-btn" data-id="2" style="width: 100%; margin-top: 0.5rem;">Tambah ke Keranjang</button>
+                    </div>
+                </div>
+                <div class="card product-card" data-id="3">
+                    <img src="https://images.unsplash.com/photo-1677921739245-4efaa1914ef3?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Rawon" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-title">Rawon Surabaya</h3>
+                        <p class="product-price">Rp 45.000</p>
+                        <button class="btn-primary add-to-cart-btn" data-id="3" style="width: 100%; margin-top: 0.5rem;">Tambah ke Keranjang</button>
+                    </div>
+                </div>
+                <div class="card product-card" data-id="4">
+                    <img src="https://images.unsplash.com/photo-1707269561481-a4a0370a980a?q=80&w=676&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Gado-gado" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-title">Gado-gado</h3>
+                        <p class="product-price">Rp 28.000</p>
+                        <button class="btn-primary add-to-cart-btn" data-id="4" style="width: 100%; margin-top: 0.5rem;">Tambah ke Keranjang</button>
+                    </div>
+                </div>
+                <div class="card product-card" data-id="5">
+                    <img src="https://images.unsplash.com/photo-1687425973269-af0d62587769?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Bakso" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-title">Bakso Malang</h3>
+                        <p class="product-price">Rp 30.000</p>
+                        <button class="btn-primary add-to-cart-btn" data-id="5" style="width: 100%; margin-top: 0.5rem;">Tambah ke Keranjang</button>
+                    </div>
+                </div>
+                <div class="card product-card" data-id="7">
+                    <img src="https://images.unsplash.com/photo-1695712641569-05eee7b37b6d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Lumpia" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-title">Lumpia Goreng</h3>
+                        <p class="product-price">Rp 15.000</p>
+                        <button class="btn-primary add-to-cart-btn" data-id="7" style="width: 100%; margin-top: 0.5rem;">Tambah ke Keranjang</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <h3 style="color: var(--secondary); font-size: 1.5rem;">RUMAH MAKAN PADANG</h3>
+                    <p>Menyajikan hidangan khas Minang dengan cita rasa autentik, bahan berkualitas tinggi, dan pelayanan terbaik.</p>
+                </div>
+                <div>
+                    <h3>Hubungi Kami</h3>
+                    <p><i class="fa-solid fa-location-dot"></i> Jl. Warisan No. 45, Jakarta</p>
+                    <p><i class="fa-solid fa-phone"></i> +62 21 555 1234</p>
+                    <p><i class="fa-solid fa-envelope"></i> info@rmpadang.com</p>
+                </div>
+                <div>
+                    <h3>Jam Perjamuan</h3>
+                    <p>Setiap Hari</p>
+                    <p>11:00 - 23:00 WIB</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 RUMAH MAKAN PADANG. Masakan Khas Padang.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>

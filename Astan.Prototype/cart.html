@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keranjang - Rumah Makan Padang</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="logo">RM<span>PADANG</span></a>
+            <div class="menu-toggle" onclick="toggleMobileMenu()"><i class="fa-solid fa-bars"></i></div>
+            <div class="nav-menu">
+                <a href="index.html">Beranda</a>
+                <a href="menu.html">Menu</a>
+                <a href="history.html">Riwayat</a>
+                <a href="cart.html" class="cart-icon active">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="cart-count">0</span>
+                </a>
+                <a href="login.html" class="btn-login">Masuk</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Stepper -->
+        <div class="checkout-stepper">
+            <div class="step active">
+                <div class="step-num">1</div>
+                <span>Keranjang</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <span>Pengiriman</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <span>Pembayaran</span>
+            </div>
+        </div>
+
+        <h1 style="font-family: 'Fraunces', serif; margin-bottom: 2.5rem; font-size: 2.5rem; color: var(--primary);">Pesanan Anda</h1>
+        
+        <div class="cart-grid">
+            <!-- Left Side: Items -->
+            <div id="cart-items-container">
+                <!-- Loaded via JS -->
+            </div>
+            
+            <!-- Right Side: Summary -->
+            <div class="order-summary-card">
+                <h3 style="margin-top: 0; margin-bottom: 2rem; font-family: 'Fraunces', serif; font-size: 1.5rem;">Ringkasan Pesanan</h3>
+                
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="summary-subtotal">Rp 0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Biaya Layanan (5%)</span>
+                    <span id="summary-service">Rp 0</span>
+                </div>
+                <div class="summary-row" style="color: #16a34a; font-weight: 600;">
+                    <span>Diskon Heritage</span>
+                    <span>- Rp 0</span>
+                </div>
+                
+                <div class="summary-row summary-total">
+                    <span>Total Keseluruhan</span>
+                    <span id="cart-total">Rp 0</span>
+                </div>
+                
+                <div style="background: #fdfae6; padding: 1rem; border-radius: 12px; margin: 2rem 0; font-size: 0.8rem; color: #856404; display: flex; gap: 0.75rem;">
+                    <span><i class="fa-solid fa-circle-info"></i></span>
+                    <p style="margin: 0;">Nikmati potongan harga otomatis untuk setiap pembelian menu "Resep Warisan".</p>
+                </div>
+                
+                <a href="checkout.html" class="btn-primary" style="width: 100%; text-align: center; margin-top: 1.5rem; text-decoration: none; display: block; padding: 1rem; background: var(--primary); color: white; border-radius: 12px;">
+                    Lanjut ke Checkout <i class="fa-solid fa-arrow-right"></i>
+                </a>
+                
+                <div style="text-align: center; margin-top: 1.5rem;">
+                    <a href="menu.html" style="color: var(--gray-500); text-decoration: none; font-size: 0.9rem; font-weight: 600;"><i class="fa-solid fa-arrow-left"></i> Tambah Menu Lain</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <h3 style="color: var(--secondary); font-size: 1.5rem;">RUMAH MAKAN PADANG</h3>
+                    <p>Masakan Khas Padang Nan Autentik.</p>
+                </div>
+                <div>
+                    <h3>Kontak</h3>
+                    <p><i class="fa-solid fa-phone"></i> +62 21 555 1234</p>
+                    <p><i class="fa-solid fa-envelope"></i> info@rmpadang.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 RUMAH MAKAN PADANG. Masakan Khas Padang.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+        // Trigger render on load
+        window.addEventListener('load', () => {
+            renderCartPage();
+        });
+    </script>
+</body>
+</html>

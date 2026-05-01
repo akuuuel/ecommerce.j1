@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Stok - Rumah Makan Padang</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <script src="main.js"></script>
+    <script>
+        window.addEventListener('load', function() {
+            protectAdminPage();
+            renderInventoryReport();
+        });
+
+        function renderInventoryReport() {
+            const report = db.getInventoryReport();
+            const products = db.getProducts();
+            
+            // Update summary
+            document.getElementById('total-products').textContent = report.totalProducts;
+            document.getElementById('total-stock').textContent = report.totalStock + ' unit';
+            document.getElementById('average-stock').textContent = report.averageStock + ' unit';
+            document.getElementById('low-stock-count').textContent = report.lowStockItems.length;
+            
+            // Render products table
+            const tableBody = document.getElementById('inventory-table-body');
+            tableBody.innerHTML = products.slice(0, 9).map(product => {
+                const isLow = product.stock < 30;
+                const statusClass = isLow ? 'color: red; font-weight: 600;' : '';
+                const statusText = isLow ? '<i class="fa-solid fa-triangle-exclamation"></i> RENDAH' : '<i class="fa-solid fa-circle-check"></i> Normal';
+                return `
+                    <tr ${isLow ? 'style="background: #ffe6e6;"' : ''}>
+                        <td>${product.id}</td>
+                        <td>${product.name}</td>
+                        <td>${product.category}</td>
+                        <td>Rp ${product.price.toLocaleString()}</td>
+                        <td style="${statusClass}">${product.stock} ${statusText}</td>
+                        <td>${product.stock < 30 ? '<i class="fa-solid fa-triangle-exclamation"></i> Perlu Restock' : '<i class="fa-solid fa-circle-check"></i> Cukup'}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Show low stock alert
+            if (report.lowStockItems.length > 0) {
+                const lowStockHTML = report.lowStockItems.map(p => 
+                    `<li>${p.name}: ${p.stock} unit</li>`
+                ).join('');
+                document.getElementById('low-stock-items').innerHTML = lowStockHTML;
+            } else {
+                document.getElementById('low-stock-items').innerHTML = '<li style="color: green;"><i class="fa-solid fa-circle-check"></i> Semua produk stok cukup</li>';
+            }
+        }
+    </script>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <h2 style="margin-bottom: 2rem; text-align: center; font-family: 'Fraunces', serif; color: var(--primary);">RM PADANG</h2>
+            <nav class="sidebar-nav">
+                <a href="admin.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+                <a href="product.html"><i class="fa-solid fa-utensils"></i> Kelola Produk</a>
+                <a href="orders.html"><i class="fa-solid fa-box"></i> Pesanan</a>
+                <a href="customers.html"><i class="fa-solid fa-users"></i> Pelanggan</a>
+                <a href="inventory-report.html" class="active"><i class="fa-solid fa-file-invoice-dollar"></i> Laporan Stok</a>
+                <a href="settings.html"><i class="fa-solid fa-gear"></i> Pengaturan</a>
+                <a href="#" onclick="logout(); return false;" style="margin-top: 2rem;"><i class="fa-solid fa-right-from-bracket"></i> Keluar</a>
+            </nav>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="admin-main">
+            <div class="print-header">
+                <h1>RM PADANG - Laporan Stok</h1>
+                <p>Dicetak pada: ${new Date().toLocaleString('id-ID')}</p>
+            </div>
+            <div class="admin-header">
+                <h1>Laporan Stok & Inventaris</h1>
+                <div class="admin-header-actions">
+                    <button class="btn-primary" onclick="exportStockReport()"><i class="fa-solid fa-file-export"></i> Export Laporan</button>
+                    <button class="btn-secondary" onclick="printStockReport()" style="background: #4CAF50; color: white; border: none;"><i class="fa-solid fa-print"></i> Cetak Laporan</button>
+                </div>
+            </div>
+            
+            <!-- Summary Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Produk</h3>
+                    <p style="font-size: 2rem; font-weight: 700;" id="total-products">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Stok</h3>
+                    <p style="font-size: 2rem; font-weight: 700;" id="total-stock">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Rata-rata Stok</h3>
+                    <p style="font-size: 2rem; font-weight: 700;" id="average-stock">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Stok Rendah</h3>
+                    <p style="font-size: 2rem; font-weight: 700; color: #ff6b6b;" id="low-stock-count">0</p>
+                </div>
+            </div>
+
+            <!-- Low Stock Alert -->
+            <div class="card" style="padding: 1.5rem; margin-bottom: 2rem; border-left: 4px solid #ff6b6b;">
+                <h3 style="margin-top: 0; color: #ff6b6b;"><i class="fa-solid fa-triangle-exclamation"></i> Peringatan: Produk Stok Rendah (< 30 unit)</h3>
+                <ul id="low-stock-items" style="margin: 1rem 0;">
+                </ul>
+            </div>
+
+            <!-- Inventory Table -->
+            <div class="card" style="padding: 1.5rem;">
+                <h3 style="margin-bottom: 1rem;">Detail Inventaris</h3>
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nama Produk</th>
+                                <th>Kategori</th>
+                                <th>Harga</th>
+                                <th>Stok</th>
+                                <th>Rekomendasi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function exportStockReport() {
+            const products = db.getProducts();
+            let csv = 'ID,Nama Produk,Kategori,Harga,Stok\n';
+            products.forEach(p => {
+                csv += `${p.id},"${p.name}","${p.category}",${p.price},${p.stock}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'stock-report.csv';
+            a.click();
+            showToast('Laporan berhasil didownload!');
+        }
+
+        function printStockReport() {
+            window.print();
+            showToast('Siap cetak laporan stok');
+        }
+    </script>
+</body>
+</html>

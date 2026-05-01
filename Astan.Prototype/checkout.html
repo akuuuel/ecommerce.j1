@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Rumah Makan Padang</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #5D4037; /* Deep Brown */
+            --secondary: #8D6E63; /* Earthy Brown */
+            --bg-soft: #FDF8F5; /* Warm Soft Cream */
+            --white: #ffffff;
+            --gray-100: #f1f5f9;
+            --gray-400: #94a3b8;
+            --gray-800: #1e293b;
+        }
+
+        body {
+            background-color: var(--bg-soft);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* Stepper Progress */
+        .checkout-stepper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 3rem 0;
+            gap: 1rem;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--gray-400);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .step.active {
+            color: var(--primary);
+        }
+
+        .step.completed {
+            color: #16a34a;
+        }
+
+        .step-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-num {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(93, 64, 55, 0.2);
+        }
+
+        .step.completed .step-num {
+            background: #16a34a;
+            color: white;
+        }
+
+        .step-line {
+            width: 50px;
+            height: 2px;
+            background: var(--gray-100);
+        }
+        
+        .step.completed + .step-line {
+            background: #16a34a;
+        }
+
+        /* Checkout Layout */
+        .checkout-grid {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 2.5rem;
+            align-items: start;
+            margin-bottom: 5rem;
+        }
+
+        .checkout-card {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .section-header span {
+            background: var(--primary);
+            color: white;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        .method-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .method-card {
+            border: 2px solid var(--gray-100);
+            border-radius: 16px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            position: relative;
+        }
+
+        .method-card input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .method-card:hover {
+            border-color: var(--primary);
+            background: rgba(93, 64, 55, 0.02);
+        }
+
+        .method-card.active {
+            border-color: var(--primary);
+            background: rgba(93, 64, 55, 0.05);
+        }
+
+        .method-card img {
+            height: 30px;
+            object-fit: contain;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 2px solid var(--gray-100);
+            border-radius: 12px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        @media (max-width: 992px) {
+            .checkout-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="logo">RM<span>PADANG</span></a>
+            <div class="menu-toggle" onclick="toggleMobileMenu()"><i class="fa-solid fa-bars"></i></div>
+            <div class="nav-menu">
+                <a href="index.html">Beranda</a>
+                <a href="menu.html">Menu</a>
+                <a href="history.html">Riwayat</a>
+                <a href="cart.html" class="cart-icon">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="cart-count">0</span>
+                </a>
+                <a href="login.html" class="btn-login">Masuk</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Stepper -->
+        <div class="checkout-stepper">
+            <div class="step completed">
+                <div class="step-num"><i class="fa-solid fa-check"></i></div>
+                <span>Keranjang</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step active">
+                <div class="step-num">2</div>
+                <span>Pengiriman</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <span>Pembayaran</span>
+            </div>
+        </div>
+
+        <h1 style="font-family: 'Fraunces', serif; margin-bottom: 2.5rem; font-size: 2.5rem; color: var(--primary);">Detail Pengiriman</h1>
+        
+        <form id="checkout-form" onsubmit="processCheckout(event)">
+            <div class="checkout-grid">
+                <!-- Left Side: Form -->
+                <div class="checkout-card">
+                    <!-- Delivery Info -->
+                    <div class="section-header">
+                        <span><i class="fa-solid fa-user"></i></span>
+                        <h2 style="margin: 0; font-size: 1.25rem;">Informasi Penerima</h2>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2.5rem;">
+                        <div class="form-group">
+                            <label>Nama Lengkap</label>
+                            <input type="text" name="name" required placeholder="Contoh: Budi Santoso">
+                        </div>
+                        <div class="form-group">
+                            <label>Nomor Telepon</label>
+                            <input type="tel" name="phone" required placeholder="0812xxxxxx">
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>Alamat Pengiriman Lengkap</label>
+                            <textarea name="address" rows="3" required placeholder="Nama jalan, nomor rumah, detail lokasi..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Shipping Method -->
+                    <div class="section-header">
+                        <span><i class="fa-solid fa-truck"></i></span>
+                        <h2 style="margin: 0; font-size: 1.25rem;">Metode Pengiriman</h2>
+                    </div>
+                    <div class="method-grid">
+                        <label class="method-card active">
+                            <input type="radio" name="shipping" value="Gojek" checked onchange="updateShippingUI(this)">
+                            <img src="aset/gojek.png" alt="Gojek" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/9/9f/Gojek_logo_2019.svg'">
+                            <div style="font-size: 0.8rem; font-weight: 700;">Rp 15.000</div>
+                        </label>
+                        <label class="method-card">
+                            <input type="radio" name="shipping" value="Grab" onchange="updateShippingUI(this)">
+                            <img src="aset/grab.png" alt="Grab" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Grab_Logo.svg/1200px-Grab_Logo.svg.png'">
+                            <div style="font-size: 0.8rem; font-weight: 700;">Rp 15.000</div>
+                        </label>
+                        <label class="method-card">
+                            <input type="radio" name="shipping" value="ShopeeFood" onchange="updateShippingUI(this)">
+                            <img src="aset/shoopefood.png" alt="ShopeeFood" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/ShopeeFood.svg/1200px-ShopeeFood.svg.png'">
+                            <div style="font-size: 0.8rem; font-weight: 700;">Rp 12.000</div>
+                        </label>
+                        <label class="method-card">
+                            <input type="radio" name="shipping" value="J&T" onchange="updateShippingUI(this)">
+                            <img src="aset/jnt.png" alt="J&T" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/J%26T_Express_logo.svg/1200px-J%26T_Express_logo.svg.png'">
+                            <div style="font-size: 0.8rem; font-weight: 700;">Rp 18.000</div>
+                        </label>
+                        <label class="method-card">
+                            <input type="radio" name="shipping" value="Sicepat" onchange="updateShippingUI(this)">
+                            <img src="aset/sicepat.png" alt="Sicepat" onerror="this.src='https://upload.wikimedia.org/wikipedia/id/thumb/0/03/Logo_Sicepat_Ekspres.png/1200px-Logo_Sicepat_Ekspres.png'">
+                            <div style="font-size: 0.8rem; font-weight: 700;">Rp 17.000</div>
+                        </label>
+                        <label class="method-card">
+                            <input type="radio" name="shipping" value="Ambil Sendiri" onchange="updateShippingUI(this)">
+                            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;"><i class="fa-solid fa-house-user"></i></div>
+                            <div style="font-size: 0.8rem; font-weight: 700;">Ambil Sendiri</div>
+                        </label>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="section-header" style="margin-top: 3rem;">
+                        <span><i class="fa-solid fa-credit-card"></i></span>
+                        <h2 style="margin: 0; font-size: 1.25rem;">Metode Pembayaran</h2>
+                    </div>
+                    <div class="method-grid">
+                        <label class="method-card active">
+                            <input type="radio" name="payment" value="QRIS" checked onchange="updatePaymentUI(this)">
+                            <img src="aset/qris.png" alt="QRIS" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg'">
+                            <div style="font-size: 0.7rem; color: var(--gray-500);">QR Scan</div>
+                        </label>
+                        <label class="method-card">
+                            <input type="radio" name="payment" value="GoPay" onchange="updatePaymentUI(this)">
+                            <img src="aset/gopay.png" alt="GoPay" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Gopay_logo.svg/1200px-Gopay_logo.svg.png'">
+                            <div style="font-size: 0.7rem; color: var(--gray-500);">E-Wallet</div>
+                        </label>
+                        <label class="method-card">
+                            <input type="radio" name="payment" value="Dana" onchange="updatePaymentUI(this)">
+                            <img src="aset/dana.png" alt="Dana" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Logo_dana_blue.svg/1200px-Logo_dana_blue.svg.png'">
+                            <div style="font-size: 0.7rem; color: var(--gray-500);">E-Wallet</div>
+                        </label>
+                        <label class="method-card">
+                            <input type="radio" name="payment" value="OVO" onchange="updatePaymentUI(this)">
+                            <img src="aset/ovo.png" alt="OVO" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Logo_ovo_purple.svg/1200px-Logo_ovo_purple.svg.png'">
+                            <div style="font-size: 0.7rem; color: var(--gray-500);">E-Wallet</div>
+                        </label>
+                        <label class="method-card">
+                            <input type="radio" name="payment" value="BRI" onchange="updatePaymentUI(this)">
+                            <img src="aset/bri.png" alt="BRI" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/BRI_Logo.svg/1200px-BRI_Logo.svg.png'">
+                            <div style="font-size: 0.7rem; color: var(--gray-500);">Transfer VA</div>
+                        </label>
+                        <label class="method-card">
+                            <input type="radio" name="payment" value="BNI" onchange="updatePaymentUI(this)">
+                            <img src="aset/bni.png" alt="BNI" onerror="this.src='https://upload.wikimedia.org/wikipedia/id/thumb/5/55/BNI_logo.svg/1200px-BNI_logo.svg.png'">
+                            <div style="font-size: 0.7rem; color: var(--gray-500);">Transfer VA</div>
+                        </label>
+                        <label class="method-card">
+                            <input type="radio" name="payment" value="Mandiri" onchange="updatePaymentUI(this)">
+                            <img src="aset/mandiri.png" alt="Mandiri" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Bank_Mandiri_logo_2016.svg/1200px-Bank_Mandiri_logo_2016.svg.png'">
+                            <div style="font-size: 0.7rem; color: var(--gray-500);">Transfer VA</div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Right Side: Final Summary -->
+                <div style="background: var(--white); border-radius: 24px; padding: 2rem; position: sticky; top: 100px; box-shadow: 0 15px 35px rgba(93, 64, 55, 0.05); border: 1px solid rgba(93, 64, 55, 0.05);">
+                    <h3 style="margin-top: 0; margin-bottom: 2rem; font-family: 'Fraunces', serif; font-size: 1.5rem;">Total Pembayaran</h3>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 1.25rem; font-size: 0.95rem; color: var(--gray-500);">
+                        <span>Pesanan Anda</span>
+                        <span id="checkout-subtotal">Rp 0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 1.25rem; font-size: 0.95rem; color: var(--gray-500);">
+                        <span>Ongkos Kirim</span>
+                        <span id="checkout-shipping">Rp 15.000</span>
+                    </div>
+                    
+                    <div style="border-top: 1px dashed var(--gray-200); margin-top: 1.5rem; padding-top: 1.5rem; display: flex; justify-content: space-between; color: var(--gray-800); font-weight: 800; font-size: 1.25rem;">
+                        <span>Total Tagihan</span>
+                        <span id="checkout-total" style="color: var(--primary);">Rp 0</span>
+                    </div>
+                    
+                    <div style="background: #eef2ff; padding: 1rem; border-radius: 12px; margin: 2rem 0; font-size: 0.8rem; color: #4338ca; display: flex; gap: 0.75rem;">
+                        <span><i class="fa-solid fa-lock"></i></span>
+                        <p style="margin: 0;">Pembayaran Anda dienkripsi dan diproses secara aman melalui partner terpercaya kami.</p>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary" style="width: 100%; padding: 1.25rem; border-radius: 15px; font-size: 1.1rem; box-shadow: 0 10px 20px rgba(93, 64, 55, 0.2);">
+                        Konfirmasi & Bayar Sekarang
+                    </button>
+                    
+                    <div style="text-align: center; margin-top: 1.5rem;">
+                        <a href="cart.html" style="color: var(--gray-500); text-decoration: none; font-size: 0.9rem; font-weight: 600;"><i class="fa-solid fa-arrow-left"></i> Kembali ke Keranjang</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script src="main.js"></script>
+    <script>
+        window.addEventListener('load', () => {
+            updateCheckoutSummary();
+        });
+
+        function updateShippingUI(radio) {
+            document.querySelectorAll('input[name="shipping"]').forEach(i => i.parentElement.classList.remove('active'));
+            radio.parentElement.classList.add('active');
+            updateCheckoutSummary();
+        }
+
+        function updatePaymentUI(radio) {
+            document.querySelectorAll('input[name="payment"]').forEach(i => i.parentElement.classList.remove('active'));
+            radio.parentElement.classList.add('active');
+        }
+
+        function updateCheckoutSummary() {
+            const subtotal = getCartTotal();
+            const shipping = document.querySelector('input[name="shipping"]:checked')?.value;
+            
+            let shippingFee = 0;
+            switch(shipping) {
+                case 'Gojek': case 'Grab': shippingFee = 15000; break;
+                case 'ShopeeFood': shippingFee = 12000; break;
+                case 'J&T': shippingFee = 18000; break;
+                case 'Sicepat': shippingFee = 17000; break;
+                case 'Ambil Sendiri': shippingFee = 0; break;
+                default: shippingFee = 0;
+            }
+            
+            const serviceFee = Math.round(subtotal * 0.05);
+            const total = subtotal + serviceFee + shippingFee;
+
+            document.getElementById('checkout-subtotal').textContent = `Rp ${(subtotal + serviceFee).toLocaleString()}`;
+            document.getElementById('checkout-shipping').textContent = `Rp ${shippingFee.toLocaleString()}`;
+            document.getElementById('checkout-total').textContent = `Rp ${total.toLocaleString()}`;
+        }
+    </script>
+    <!-- Checkout Modal Overlay -->
+    <div id="checkout-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; padding: 1.5rem;">
+        <div class="checkout-card" id="modal-body" style="max-width: 450px; width: 100%; text-align: center; animation: modalIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
+            <!-- Dynamic Content via main.js -->
+        </div>
+    </div>
+
+    <style>
+        @keyframes modalIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes loading {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(100%); }
+        }
+    </style>
+</body>
+</html>

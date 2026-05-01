@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Pesanan - Rumah Makan Padang</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <script src="main.js"></script>
+    <script>
+        window.addEventListener('load', function() {
+            protectAdminPage();
+            renderOrdersPage();
+        });
+
+        function renderOrdersPage() {
+            const orders = db.getOrders().reverse().slice(0, 6); // Show 6 latest orders
+            const report = db.getSalesReport();
+            
+            // Update stats
+            document.getElementById('total-orders').textContent = report.totalOrders;
+            document.getElementById('completed-orders').textContent = report.completedOrders;
+            document.getElementById('pending-orders').textContent = report.pendingOrders;
+            document.getElementById('total-revenue').textContent = 'Rp ' + report.totalRevenue.toLocaleString();
+            
+            // Render cards
+            const container = document.getElementById('orders-table-body');
+            container.innerHTML = orders.map(order => {
+                const statusClass = order.status === 'Selesai' ? 'status-selesai' : (order.status === 'Diproses' ? 'status-diproses' : 'status-dibatalkan');
+                
+                return `
+                    <div class="admin-item-card">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                            <div>
+                                <span style="font-size: 0.75rem; color: var(--primary); font-weight: 700;">${order.id}</span>
+                                <h3 style="margin-top: 0.25rem; font-size: 0.9rem;">${order.customer}</h3>
+                                <p style="color: #666; font-size: 0.8rem; margin: 0.25rem 0;"><i class="fa-solid fa-calendar-days"></i> ${order.date}</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-weight: 700; color: var(--gray-900); font-size: 1rem;">Rp ${order.total.toLocaleString()}</div>
+                                <span class="status-badge ${statusClass}">
+                                    ${order.status}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                             <button class="btn-secondary-sm" onclick="window.location.href='order-detail.html?id=${order.id}'" style="width: 100%;"><i class="fa-solid fa-eye"></i> Detail</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    </script>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <h2 style="margin-bottom: 2rem; text-align: center; font-family: 'Fraunces', serif; color: var(--primary);">RM PADANG</h2>
+            <nav class="sidebar-nav">
+                <a href="admin.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+                <a href="product.html"><i class="fa-solid fa-utensils"></i> Kelola Produk</a>
+                <a href="orders.html" class="active"><i class="fa-solid fa-box"></i> Pesanan</a>
+                <a href="customers.html"><i class="fa-solid fa-users"></i> Pelanggan</a>
+                <a href="inventory-report.html"><i class="fa-solid fa-file-invoice-dollar"></i> Laporan Stok</a>
+                <a href="settings.html"><i class="fa-solid fa-gear"></i> Pengaturan</a>
+                <a href="#" onclick="logout(); return false;" style="margin-top: 2rem;"><i class="fa-solid fa-right-from-bracket"></i> Keluar</a>
+            </nav>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="admin-main">
+            <div class="print-header">
+                <h1>RM PADANG - Laporan Pesanan</h1>
+                <p>Dicetak pada: ${new Date().toLocaleString('id-ID')}</p>
+            </div>
+            <h1>Kelola Pesanan</h1>
+            
+            <div class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+                <div class="stats-grid" style="margin-bottom: 0;">
+                    <div class="stat-card" style="background: var(--gray-50); border: none;">
+                        <p style="margin: 0; font-size: 0.8rem; color: #666;">Total Pesanan</p>
+                        <h3 style="margin: 0.25rem 0 0 0;" id="total-orders">0</h3>
+                    </div>
+                    <div class="stat-card" style="background: var(--gray-50); border: none;">
+                        <p style="margin: 0; font-size: 0.8rem; color: #666;">Pesanan Selesai</p>
+                        <h3 style="margin: 0.25rem 0 0 0; color: #22c55e;" id="completed-orders">0</h3>
+                    </div>
+                    <div class="stat-card" style="background: var(--gray-50); border: none;">
+                        <p style="margin: 0; font-size: 0.8rem; color: #666;">Dalam Proses</p>
+                        <h3 style="margin: 0.25rem 0 0 0; color: #f59e0b;" id="pending-orders">0</h3>
+                    </div>
+                    <div class="stat-card" style="background: var(--gray-50); border: none;">
+                        <p style="margin: 0; font-size: 0.8rem; color: #666;">Pendapatan</p>
+                        <h3 style="margin: 0.25rem 0 0 0; color: var(--primary); font-size: 1rem;" id="total-revenue">Rp 0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="padding: 1.5rem;">
+                <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="margin: 0;">Daftar Pesanan</h3>
+                    <input type="text" id="order-search" placeholder="Cari pesanan..." style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; width: 250px;">
+                </div>
+                
+                <div id="orders-table-body" class="admin-card-grid">
+                    <!-- Orders will be loaded as cards here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

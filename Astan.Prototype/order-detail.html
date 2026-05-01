@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Pesanan - Rumah Makan Padang</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <script src="main.js"></script>
+    <script>
+        window.addEventListener('load', function() {
+            protectAdminPage();
+            loadOrderDetail();
+        });
+
+        let currentOrder = null;
+
+        function loadOrderDetail() {
+            const params = new URLSearchParams(window.location.search);
+            const orderId = params.get('id') || 'ORD001';
+            
+            currentOrder = db.getOrders().find(o => o.id === orderId);
+            if (!currentOrder) {
+                showToast('Pesanan tidak ditemukan!', 'error');
+                window.location.href = 'orders.html';
+                return;
+            }
+
+            // Update order info
+            document.getElementById('order-id').textContent = currentOrder.id;
+            document.getElementById('order-date').textContent = currentOrder.date;
+            document.getElementById('order-customer').textContent = currentOrder.customer;
+            document.getElementById('order-email').textContent = currentOrder.email || '-';
+            document.getElementById('order-phone').textContent = currentOrder.phone || '-';
+            document.getElementById('order-address').textContent = currentOrder.address || '-';
+            document.getElementById('order-total').textContent = 'Rp ' + currentOrder.total.toLocaleString();
+            
+            // Render items
+            const itemsBody = document.getElementById('order-items-body');
+            const grandTotalEl = document.getElementById('order-grand-total');
+            
+            if (currentOrder.details && currentOrder.details.length > 0) {
+                itemsBody.innerHTML = currentOrder.details.map(item => `
+                    <tr>
+                        <td style="padding: 1rem; border-bottom: 1px solid #eee;">${item.name}</td>
+                        <td style="padding: 1rem; border-bottom: 1px solid #eee;">Rp ${item.price.toLocaleString()}</td>
+                        <td style="padding: 1rem; border-bottom: 1px solid #eee;">${item.quantity}</td>
+                        <td style="padding: 1rem; border-bottom: 1px solid #eee; font-weight: 700;">Rp ${(item.price * item.quantity).toLocaleString()}</td>
+                    </tr>
+                `).join('');
+            } else {
+                itemsBody.innerHTML = `<tr><td colspan="4" style="padding: 2rem; text-align: center; color: #999;">Data item tidak tersedia (Pesanan Lama)</td></tr>`;
+            }
+            grandTotalEl.textContent = 'Rp ' + currentOrder.total.toLocaleString();
+
+            // Update status & Locking
+            const statusColor = currentOrder.status === 'Selesai' ? '#22c55e' : (currentOrder.status === 'Diproses' ? '#f59e0b' : '#ef4444');
+            document.getElementById('order-status').innerHTML = `<span style="color: ${statusColor}; font-weight: 800; background: ${statusColor}11; padding: 4px 12px; border-radius: 50px;">${currentOrder.status.toUpperCase()}</span>`;
+
+            // Lock logic
+            const isLocked = currentOrder.status === 'Selesai' || currentOrder.status === 'Dibatalkan';
+            document.getElementById('status-controls').style.display = isLocked ? 'none' : 'flex';
+            document.getElementById('lock-notice').style.display = isLocked ? 'block' : 'none';
+        }
+
+        function updateOrderStatus(newStatus) {
+            if (currentOrder) {
+                db.updateOrder(currentOrder.id, { status: newStatus });
+                showToast('Status pesanan berhasil diubah menjadi: ' + newStatus);
+                setTimeout(() => loadOrderDetail(), 1000);
+            }
+        }
+    </script>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <h2 style="margin-bottom: 2rem; text-align: center; font-family: 'Fraunces', serif; color: var(--primary);">RM PADANG</h2>
+            <nav class="sidebar-nav">
+                <a href="admin.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+                <a href="product.html"><i class="fa-solid fa-utensils"></i> Kelola Produk</a>
+                <a href="orders.html" class="active"><i class="fa-solid fa-box"></i> Pesanan</a>
+                <a href="customers.html"><i class="fa-solid fa-users"></i> Pelanggan</a>
+                <a href="inventory-report.html"><i class="fa-solid fa-file-invoice-dollar"></i> Laporan Stok</a>
+                <a href="settings.html"><i class="fa-solid fa-gear"></i> Pengaturan</a>
+                <a href="#" onclick="logout(); return false;" style="margin-top: 2rem;"><i class="fa-solid fa-right-from-bracket"></i> Keluar</a>
+            </nav>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="admin-main">
+            <div style="margin-bottom: 1.5rem;">
+                <a href="orders.html" style="color: var(--primary); text-decoration: none;"><i class="fa-solid fa-arrow-left"></i> Kembali ke Pesanan</a>
+            </div>
+
+            <h1>Detail Pesanan <span id="order-id">#ORD001</span></h1>
+            
+            <div class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+                <h3>Informasi Pesanan</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>
+                        <p><strong>Tanggal:</strong> <span id="order-date">-</span></p>
+                        <p><strong>Pelanggan:</strong> <span id="order-customer">-</span></p>
+                        <p><strong>Email:</strong> <span id="order-email">-</span></p>
+                    </div>
+                    <div>
+                        <p><strong>No. Telepon:</strong> <span id="order-phone">-</span></p>
+                        <p><strong>Alamat:</strong> <span id="order-address">-</span></p>
+                        <p><strong>Total:</strong> <span id="order-total">Rp 0</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+                <h3>Item Pesanan</h3>
+                <div class="data-table">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: var(--gray-100); text-align: left;">
+                                <th style="padding: 1rem;">Produk</th>
+                                <th style="padding: 1rem;">Harga</th>
+                                <th style="padding: 1rem;">Jumlah</th>
+                                <th style="padding: 1rem;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="order-items-body">
+                            <!-- Items will be loaded here -->
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" style="text-align: right; padding: 1rem; font-weight: 800;">Grand Total:</td>
+                                <td id="order-grand-total" style="padding: 1rem; font-weight: 800; color: var(--primary);">Rp 0</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card" style="padding: 1.5rem;" id="status-update-card">
+                <h3>Status Pesanan</h3>
+                <div style="margin-bottom: 1.5rem;">
+                    <p><strong>Status Saat Ini:</strong> <span id="order-status">-</span></p>
+                    <div id="lock-notice" style="display: none; background: #fff4e5; border-left: 4px solid #ffa117; padding: 1rem; margin-top: 1rem; color: #663c00; font-size: 0.85rem; font-weight: 600;">
+                        <i class="fa-solid fa-lock"></i> Pesanan ini telah dikunci (Selesai/Dibatalkan) dan tidak dapat diubah lagi.
+                    </div>
+                </div>
+                <div id="status-controls" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                    <button class="btn-secondary" onclick="updateOrderStatus('Diproses')" style="padding: 0.75rem 1.25rem;"><i class="fa-solid fa-hourglass-half"></i> Diproses</button>
+                    <button class="btn-secondary" onclick="updateOrderStatus('Dalam Pengiriman')" style="background: #2196F3; padding: 0.75rem 1.25rem;"><i class="fa-solid fa-truck"></i> Dalam Pengiriman</button>
+                    <button class="btn-secondary" onclick="updateOrderStatus('Selesai')" style="background: #22c55e; padding: 0.75rem 1.25rem;"><i class="fa-solid fa-check"></i> Selesai</button>
+                    <button class="btn-secondary" onclick="updateOrderStatus('Dibatalkan')" style="background: #ef4444; padding: 0.75rem 1.25rem;"><i class="fa-solid fa-xmark"></i> Batalkan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

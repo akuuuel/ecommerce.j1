@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Pelanggan - Rumah Makan Padang</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <script src="main.js"></script>
+    <script>
+        window.addEventListener('load', function() {
+            protectAdminPage();
+            renderCustomersPage();
+        });
+
+        function renderCustomersPage() {
+            const customers = db.getCustomers();
+            const container = document.getElementById('customers-table-body');
+            if (!container) return;
+
+            container.innerHTML = customers.map((customer, index) => {
+                const isActive = customer.status === 'Aktif';
+                const statusClass = isActive ? 'status-ok' : 'status-err';
+                
+                return `
+                    <div class="admin-item-card">
+                        <div class="customer-header">
+                            <div class="customer-avatar">
+                                ${customer.name.charAt(0)}
+                            </div>
+                            <div class="customer-info">
+                                <h3>${customer.name}</h3>
+                                <p>${customer.email}</p>
+                            </div>
+                        </div>
+                        <div class="customer-details">
+                            <div class="detail-row">
+                                <span><i class="fa-solid fa-phone"></i></span>
+                                <strong>${customer.phone}</strong>
+                            </div>
+                            <div class="detail-row">
+                                <span><i class="fa-solid fa-box"></i></span>
+                                <strong>${customer.orders} Pesanan</strong>
+                            </div>
+                        </div>
+                        <div class="customer-actions">
+                            <span class="status-badge ${statusClass}">
+                                ${customer.status}
+                            </span>
+                            <button class="btn-secondary-sm">Profil</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    </script>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <h2 style="margin-bottom: 2rem; text-align: center; font-family: 'Fraunces', serif; color: var(--primary);">RM PADANG</h2>
+            <nav class="sidebar-nav">
+                <a href="admin.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+                <a href="product.html"><i class="fa-solid fa-utensils"></i> Kelola Produk</a>
+                <a href="orders.html"><i class="fa-solid fa-box"></i> Pesanan</a>
+                <a href="customers.html" class="active"><i class="fa-solid fa-users"></i> Pelanggan</a>
+                <a href="inventory-report.html"><i class="fa-solid fa-file-invoice-dollar"></i> Laporan Stok</a>
+                <a href="settings.html"><i class="fa-solid fa-gear"></i> Pengaturan</a>
+                <a href="#" onclick="logout(); return false;" style="margin-top: 2rem;"><i class="fa-solid fa-right-from-bracket"></i> Keluar</a>
+            </nav>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="admin-main">
+            <h1>Kelola Pelanggan</h1>
+            
+            <div class="card" style="padding: 1.5rem;">
+                <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="margin: 0;">Daftar Pelanggan</h3>
+                    <input type="text" placeholder="Cari pelanggan..." style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; width: 250px;">
+                </div>
+                
+                <div id="customers-table-body" class="admin-card-grid">
+                    <!-- Customers will be loaded as cards here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu - Rumah Makan Padang</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="logo">RM<span>PADANG</span></a>
+            <div class="menu-toggle" onclick="toggleMobileMenu()"><i class="fa-solid fa-bars"></i></div>
+            <nav class="nav-menu">
+                <a href="index.html">Beranda</a>
+                <a href="menu.html">Menu</a>
+                <a href="history.html">Riwayat</a>
+                <a href="cart.html" class="cart-icon"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count">0</span></a>
+                <a href="login.html" class="btn-login">Masuk</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="hero">
+        <div class="hero-content">
+            <h1>Menu Kami</h1>
+            <p>Jelajahi berbagai hidangan khas Minang.</p>
+            <a href="#menu" class="btn-primary">Lihat Menu</a>
+        </div>
+    </main>
+
+    <section id="menu" class="product-section">
+        <div class="container">
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Cari menu...">
+            </div>
+            <div class="product-grid" id="menu-product-grid">
+                <!-- Produk dimuat dari main.js -->
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div>
+                <h3>RUMAH MAKAN PADANG</h3>
+                <p>Masakan Khas Padang Nan Autentik.</p>
+            </div>
+            <div>
+                <h3>Hubungi Kami</h3>
+                <p><i class="fa-solid fa-location-dot"></i> Jl. Warisan No. 45, Jakarta</p>
+                <p><i class="fa-solid fa-phone"></i> +62 21 555 1234</p>
+                <p><i class="fa-solid fa-envelope"></i> info@rmpadang.com</p>
+            </div>
+            <div>
+                <h3>Jam Operasional</h3>
+                <p>Setiap Hari</p>
+                <p>11:00 - 23:00 WIB</p>
+            </div>
+        </div>
+    </footer>
+    <script src="main.js"></script>
+</body>
+</html>
